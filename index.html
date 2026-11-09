@@ -4,11 +4,13 @@
 <title>Commande Brasserie Stéphanoise</title>
 <link rel="icon" type="image/png" href="https://img.mailinblue.com/3245010/images/content_library/original/6aecb713e6b1162f2cd80458.png">
 <link rel="apple-touch-icon" href="https://img.mailinblue.com/3245010/images/content_library/original/6aecb713e6b1162f2cd80458.png">
-<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Brasserie"><meta name="application-name" content="Brasserie"><meta name="theme-color" content="#17936F">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-title" content="Brasserie"><meta name="application-name" content="Brasserie"><link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#17936F">
 </head><body style="margin:0;background:#F7F2E8;font-family:Arial,sans-serif">
 <p id="ld" style="text-align:center;padding:80px 20px;color:#6E645B">Chargement de votre espace…</p>
 <script>
 (function(){
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__bip=e;});
+if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js"); }catch(e){} }
 var API="https://script.google.com/macros/s/AKfycbyzmQ_9y0Sc7fpRuOF4htqSDNCDkZUMUy-HAKTikw7ORMpiltBntdZKg_3fpkgictI/exec";
 var q=new URLSearchParams(location.search), tk=q.get("client")||q.get("c")||"", base=location.origin+location.pathname;
 if(q.has("logout")){ try{ localStorage.removeItem("cp_token"); localStorage.removeItem("cp_nom"); }catch(e){} }
@@ -16,7 +18,7 @@ else if(!tk){ try{ tk=localStorage.getItem("cp_token")||""; }catch(e){} }
 try{ history.replaceState(null,"",tk?base+"?client="+encodeURIComponent(tk):base); }catch(e){}
 function get(u){ return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.text(); }); }
 function fail(){ document.getElementById("ld").innerHTML='Impossible de charger le catalogue pour le moment.<br><br><a href="'+location.href+'">Réessayer</a><br><br>contact@labrasseriestephanoise.com'; }
-var shim='<script>(function(){var A="'+API+'",H={};var run=new Proxy({},{get:function(_,k){if(k==="withSuccessHandler")return function(f){H.ok=f;return run;};if(k==="withFailureHandler")return function(f){H.ko=f;return run;};return function(){var a=[].slice.call(arguments),ok=H.ok,ko=H.ko;H={};fetch(A,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fn:k,args:a})}).then(function(r){return r.json();}).then(function(j){if(j.ok){ok&&ok(j.r);}else{ko&&ko(new Error(j.err||"Erreur"));}}).catch(function(){ko&&ko(new Error("Connexion impossible, réessayez dans un instant."));});};}});window.google={script:{run:run}};})();<\/script>';
+var shim='<script>(function(){var A="'+API+'",H={};var run=new Proxy({},{get:function(_,k){if(k==="withSuccessHandler")return function(f){H.ok=f;return run;};if(k==="withFailureHandler")return function(f){H.ko=f;return run;};return function(){var a=[].slice.call(arguments),ok=H.ok,ko=H.ko;H={};fetch(A,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fn:k,args:a})}).then(function(r){return r.json();}).then(function(j){if(j.ok){ok&&ok(j.r);}else{ko&&ko(new Error(j.err||"Erreur"));}}).catch(function(){ko&&ko(new Error("Connexion impossible, réessayez dans un instant."));});};}});window.google={script:{run:run}};window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__bip=e;});})();<\/script>';
 Promise.all([get(API+"?api=app"), get(API+"?api=data"+(tk?"&client="+encodeURIComponent(tk):""))]).then(function(r){
  var html=r[0], d=JSON.parse(r[1]);
  if(tk && d.login){ try{ history.replaceState(null,"",base); }catch(e){} }
