@@ -14,14 +14,14 @@ window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();win
 if("serviceWorker" in navigator){ try{ navigator.serviceWorker.register("sw.js"); }catch(e){} }
 var API="https://script.google.com/macros/s/AKfycbyzmQ_9y0Sc7fpRuOF4htqSDNCDkZUMUy-HAKTikw7ORMpiltBntdZKg_3fpkgictI/exec";
 var q=new URLSearchParams(location.search), tk=q.get("client")||q.get("c")||"", base=location.origin+location.pathname;
-if(q.has("logout")){ try{ localStorage.removeItem("cp_token"); localStorage.removeItem("cp_nom"); }catch(e){} }
+if(q.has("logout")){ try{ localStorage.removeItem("cp_token"); localStorage.removeItem("cp_nom"); Object.keys(localStorage).forEach(function(k){ if(k.indexOf("cp_d_")===0) localStorage.removeItem(k); }); }catch(e){} }
 else if(!tk){ try{ tk=localStorage.getItem("cp_token")||""; }catch(e){} }
 try{ history.replaceState(null,"",tk?base+"?client="+encodeURIComponent(tk):base); }catch(e){}
 function get(u){ return fetch(u).then(function(r){ if(!r.ok) throw 0; return r.text(); }); }
 function fail(){ document.getElementById("ld").innerHTML='Impossible de charger le catalogue pour le moment.<br><br><a href="'+location.href+'">Réessayer</a><br><br>contact@labrasseriestephanoise.com'; }
 var shim='<script>(function(){var A="'+API+'",H={};var run=new Proxy({},{get:function(_,k){if(k==="withSuccessHandler")return function(f){H.ok=f;return run;};if(k==="withFailureHandler")return function(f){H.ko=f;return run;};return function(){var a=[].slice.call(arguments),ok=H.ok,ko=H.ko;H={};fetch(A,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},body:JSON.stringify({fn:k,args:a})}).then(function(r){return r.json();}).then(function(j){if(j.ok){ok&&ok(j.r);}else{ko&&ko(new Error(j.err||"Erreur"));}}).catch(function(){ko&&ko(new Error("Connexion impossible, réessayez dans un instant."));});};}});window.google={script:{run:run}};window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();window.__bip=e;});})();<\/script>';
-Promise.all([get(API+"?api=app"), get(API+"?api=data"+(tk?"&client="+encodeURIComponent(tk):""))]).then(function(r){
- var html=r[0], d=JSON.parse(r[1]);
+function boot(html, dtxt){
+ var d=JSON.parse(dtxt);
  if(tk && d.login){ try{ history.replaceState(null,"",base); }catch(e){} }
  d.url=base;
  var head=document.head.innerHTML.replace(/<script[\s\S]*$/,"");
@@ -29,7 +29,16 @@ Promise.all([get(API+"?api=app"), get(API+"?api=data"+(tk?"&client="+encodeURICo
   .replace(/<title>[^<]*<\/title>/, head.match(/<title>[\s\S]*?theme-color" content="#17936F">/)[0])
   .replace("<head>", "<head>"+shim);
  document.open(); document.write(html); document.close();
-}).catch(fail);
+}
+// Copie locale (appli + données de ce client) : affichage immédiat, puis mise à jour sur place dès que les données fraîches arrivent.
+var ca=null, cd=null; try{ ca=localStorage.getItem("cp_app"); cd=tk?localStorage.getItem("cp_d_"+tk):null; }catch(e){}
+var pa=get(API+"?api=app"), pd=get(API+"?api=data"+(tk?"&client="+encodeURIComponent(tk):""));
+function keepD(t){ try{ if(tk && !JSON.parse(t).login) localStorage.setItem("cp_d_"+tk,t); }catch(e){} }
+if(ca && cd){
+ pa.then(function(h){ if(h!==ca){ try{ localStorage.setItem("cp_app",h); }catch(e){} } }).catch(function(){});
+ pd.then(function(t){ if(t===cd) return; keepD(t); var tries=0; (function upd(){ if(window.__fresh){ try{ window.__fresh(JSON.parse(t)); }catch(e){} } else if(tries++<50) setTimeout(upd,100); })(); }).catch(function(){});
+ boot(ca, cd);
+} else Promise.all([pa, pd]).then(function(r){ try{ localStorage.setItem("cp_app",r[0]); }catch(e){} keepD(r[1]); boot(r[0], r[1]); }).catch(fail);
 })();
 </script>
 </body></html>
