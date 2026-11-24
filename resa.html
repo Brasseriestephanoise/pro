@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Réservation – La Brasserie Stéphanoise</title>
+<meta name="description" content="Réservez votre repas pour les événements de La Brasserie Stéphanoise, 15 rue Buffon, Saint-Étienne.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="La Brasserie Stéphanoise">
+<meta property="og:title" content="Réservation – La Brasserie Stéphanoise">
+<meta property="og:description" content="Réservez votre repas en ligne : La Brasserie Stéphanoise, 15 rue Buffon, Saint-Étienne.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#1D2420">
+</head><body style="margin:0;background:#F3F5F2;font-family:Arial,sans-serif">
+<p id="ld" style="text-align:center;padding:80px 20px;color:#5E6B64">Chargement…</p>
+<script>
+(function(){
+// Chargeur de la page publique de réservation (bloc 18). Page et données servies par le moteur ; ?t=1 = version de TEST.
+var P="https://script.google.com/macros/s/AKfycbyzmQ_9y0Sc7fpRuOF4htqSDNCDkZUMUy-HAKTikw7ORMpiltBntdZKg_3fpkgictI/exec";
+var T="https://script.google.com/macros/s/AKfycbwSo0ayxmyHpBeWmdvUmTolXFYLjXHsCHt-qUF2_k9ym-iKnwSngSVDGpHhKTKh0XM/exec";
+var q=new URLSearchParams(location.search),API=q.get("t")==="1"?T:P,e=q.get("e")||"",r=q.get("r")||"";
+function fail(){document.getElementById("ld").innerHTML='Impossible de charger la page pour le moment.<br><br><a href="'+location.href.replace(/"/g,"")+'">Réessayer</a>';}
+var a=fetch(API+"?api=resaapp",{credentials:"omit"}).then(function(x){if(!x.ok)throw 0;return x.text();});
+var d=e?fetch(API+"?api=resa&e="+encodeURIComponent(e)+(r?"&r="+encodeURIComponent(r):""),{credentials:"omit"}).then(function(x){return x.json();}).catch(function(){return null;}):Promise.resolve(null);
+Promise.all([a,d]).then(function(x){var h=x[0],j=x[1];if(h.indexOf("<script")<0)throw 0;
+ var inj='<script>window.__API='+JSON.stringify(API)+';window.__RD='+(j&&j.ok?JSON.stringify(j.r).replace(/</g,"\\x3c"):"null")+';<\/script>';
+ h=h.replace("<head>","<head>"+inj);document.open();document.write(h);document.close();}).catch(fail);
+})();
+</script>
+</body></html>
