@@ -56,7 +56,7 @@ window.__EVS={"sainte-barbe-2026-portes-ouvertes": {"id": "sainte-barbe-2026-por
 <script>
 (function(){
 var P="https:"+"//script.google.com/macros/s/AKfycbyzmQ_9y0Sc7fpRuOF4htqSDNCDkZUMUy-HAKTikw7ORMpiltBntdZKg_3fpkgictI/exec",T="https:"+"//script.google.com/macros/s/AKfycbwSo0ayxmyHpBeWmdvUmTolXFYLjXHsCHt-qUF2_k9ym-iKnwSngSVDGpHhKTKh0XM/exec";
-var Q=new URLSearchParams(location.search),API=Q.get("t")==="1"?T:P,EID=Q.get("e")||"",TOK=Q.get("r")||"";
+var Q=new URLSearchParams(location.search),API=Q.get("t")==="1"?T:P,EID=Q.get("e")||"",TOK=Q.get("r")||"",ACT=Q.get("actus")==="1";
 var EVS=window.__EVS||{},LK="resa_"+EID+(Q.get("t")==="1"?"_t":""),C0=null;try{C0=JSON.parse(localStorage.getItem(LK)||"null");}catch(x){}
 var EV0=EVS[EID]||(C0&&C0.ev&&Date.now()-C0.at<864e5?C0.ev:null);if(EV0){EV0=Object.assign({},EV0,{left:null});}
 var S={D:EV0?{ev:EV0,me:null}:null,live:false,slow:0,f:{n:"1",vg:"0",nom:"",prenom:"",tel:"",email:"",com:"",actus:false},busy:false,err:"",done:null,edit:false,cx:false};
@@ -89,6 +89,7 @@ function form(e,wait){var f=S.f,mx=wait||e.left==null?e.max:Math.min(e.max,Math.
 function recap(e,m){return '<div class="rec"><b>'+m.n+' repas</b>'+(e.vege&&m.vg?" dont "+m.vg+" végétarien"+(m.vg>1?"s":""):"")+(e.prix?"<br>"+eur(m.du)+" à régler "+esc(e.pay||"sur place"):"")+'<br>Au nom de '+esc(m.prenom+" "+m.nom)+'<br><span class="mut">'+esc(m.tel)+" · "+esc(m.email)+'</span>'+(m.com?'<br><span class="mut">'+esc(m.com)+'</span>':"")+'</div>';}
 function mine(e,m){var t={ok:"✓ Votre réservation est confirmée",attente:"Vous êtes sur la liste d’attente",annulee:"Cette réservation est annulée"}[m.st]||"";
  var h='<div class="card">'+(S.done?'<div class="ok">'+esc(S.done)+'</div>':"")+'<h2>'+esc(t)+'</h2>'+(m.st!=="annulee"?recap(e,m):"");
+ if(m.canActus)h+='<div class="ok" style="margin-top:12px">Vous avez demandé à recevoir nos actualités.</div><button class="big" id="actok">Confirmer mon inscription aux actualités</button>';
  if(m.st==="attente"&&m.canConfirm)h+='<div class="ok" style="margin-top:12px">Une place est disponible pour vous !</div><button class="big" id="conf">Confirmer ma réservation</button>';
  if(m.canEdit)h+='<button class="big sec" id="ed">✎ Modifier ma réservation</button>';
  if(m.canCancel)h+=S.cx?'<button class="big red" id="cx2">Oui, annuler ma réservation</button><button class="big sec" id="cx0">Non, garder ma réservation</button>':'<button class="big sec" id="cx">Annuler ma réservation</button>';
@@ -124,10 +125,11 @@ document.addEventListener("click",function(ev){var b=ev.target.closest("button")
  else if(id==="cx"){S.cx=true;S.done="";render();}else if(id==="cx0"){S.cx=false;render();}
  else if(id==="cx2"){S.cx=false;run(post("cancel",[EID,TOK]),function(r){S.D.me=r.me;S.done="Votre réservation est annulée. Merci de nous avoir prévenus !";load();});}
  else if(id==="conf"){run(post("confirm",[EID,TOK]),function(r){S.D.me=r.me;S.done="Réservation confirmée ✓ Un mail de confirmation vous a été envoyé.";load();});}
- else if(id==="again"){S.newR=true;S.done="";S.f={n:"1",vg:"0",nom:D.me.nom,prenom:D.me.prenom,tel:D.me.tel,email:D.me.email,com:"",actus:false};render();}
+ else if(id==="actok"){run(post("actus",[EID,TOK]),function(r){S.D.me=r.me;S.done="Inscription aux actualités confirmée ✓";load();});} else if(id==="again"){S.newR=true;S.done="";S.f={n:"1",vg:"0",nom:D.me.nom,prenom:D.me.prenom,tel:D.me.tel,email:D.me.email,com:"",actus:false};render();}
 });
 if(!EID){$("#app").innerHTML='<p class="ld">Lien incomplet : il manque le nom de l’événement.</p>';return;}
 render();load();
+if(ACT&&TOK){ACT=false;run(post("actus",[EID,TOK]),function(r){if(S.D)S.D.me=r.me;S.done="Inscription aux actualités confirmée ✓";load();});}
 })();
 </script>
 </body></html>
