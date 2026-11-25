@@ -36,7 +36,7 @@ var pa=get(API+"?api=app"), pd=get(API+"?api=data"+(tk?"&client="+encodeURICompo
 function keepD(t){ try{ if(tk && !JSON.parse(t).login) localStorage.setItem("cp_d_"+tk,t); }catch(e){} }
 if(ca && cd){
  pa.then(function(h){ if(h!==ca){ try{ localStorage.setItem("cp_app",h); }catch(e){} } }).catch(function(){});
- pd.then(function(t){ if(t===cd) return; keepD(t); var tries=0; (function upd(){ if(window.__fresh){ try{ window.__fresh(JSON.parse(t)); }catch(e){} } else if(tries++<50) setTimeout(upd,100); })(); }).catch(function(){});
+ pd.then(function(t){ if(t===cd) return; try{ if(JSON.parse(t).login){ localStorage.removeItem("cp_d_"+tk); localStorage.removeItem("cp_token"); localStorage.removeItem("cp_nom"); location.replace(base+"?client="+encodeURIComponent(tk)); return; } }catch(e){} keepD(t); var tries=0; (function upd(){ if(window.__fresh){ try{ window.__fresh(JSON.parse(t)); }catch(e){} } else if(tries++<50) setTimeout(upd,100); })(); }).catch(function(){});
  boot(ca, cd);
 } else Promise.all([pa, pd]).then(function(r){ try{ localStorage.setItem("cp_app",r[0]); }catch(e){} keepD(r[1]); boot(r[0], r[1]); }).catch(fail);
 })();
