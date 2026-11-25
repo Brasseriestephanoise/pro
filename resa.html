@@ -73,7 +73,7 @@ function opts(a,b,v){var h="";for(var i=a;i<=b;i++)h+='<option value="'+i+'"'+(S
 function imgB(u){return String(u||"").replace(/=w\d+$/,"");}
 function head(e){var b=imgB(e.img);return(b?'<img class="ban" src="'+esc(b)+'=w1000" srcset="'+esc(b)+'=w1000 1000w, '+esc(b)+'=w1600 1600w" sizes="(max-width:640px) 100vw, 640px" width="1920" height="1005" alt="" fetchpriority="high">':"")+head2(e);}
 function head2(e){return '<div class="top"><h1>'+esc(e.titre)+'</h1><div class="when">'+esc(cap(e.dateFr))+(e.horaire?" · "+esc(e.horaire):"")+'</div>'+(e.lieu?'<div class="where">📍 '+esc(e.lieu)+'</div>':"")
- +(e.st==="ouvert"&&e.left==null?'<div class="left">Repas disponibles : …</div>':e.st==="ouvert"&&e.left>0?'<div class="left'+(e.left<=10?" lo":"")+'">Plus que '+e.left+' repas disponible'+(e.left>1?"s":"")+'</div>':"")+'</div>';}
+ +(e.st==="ouvert"&&e.left==null?'<div class="left">Repas disponibles : …</div>':e.st==="ouvert"&&e.left>0?'<div class="left'+(e.left<=10?" lo":"")+'">'+(e.left<15?'Plus que ':'')+e.left+' repas disponible'+(e.left>1?"s":"")+'</div>':"")+'</div>';}
 function form(e,wait){var f=S.f,mx=wait||e.left==null?e.max:Math.min(e.max,Math.max(1,e.left)),n=Math.min(Number(f.n)||1,mx);f.n=String(n);if(Number(f.vg)>n)f.vg=String(n);
  return '<div class="card" id="fm"><h2>'+(wait?"Inscription sur la liste d’attente":"Réserver mon repas")+'</h2>'+(wait?'<div class="full">Complet – inscription sur liste d’attente. Nous vous écrirons si une place se libère.</div>':"")
  +'<div class="row2"><label>Nombre de repas<select data-f="n">'+opts(1,mx,f.n)+'</select></label>'+(e.vege?'<label>Dont végétariens<select data-f="vg">'+opts(0,n,f.vg)+'</select></label>':"<span></span>")+'</div>'
